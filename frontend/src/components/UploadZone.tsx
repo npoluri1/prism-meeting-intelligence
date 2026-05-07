@@ -1,4 +1,4 @@
-import { type DragEvent, type ChangeEvent, useRef, useState } from 'react'
+import { type DragEvent, useRef, useState } from 'react'
 
 const AUDIO_VIDEO = new Set(['mp3', 'm4a', 'wav', 'mp4', 'mov', 'webm', 'mkv'])
 const IMAGES      = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'])

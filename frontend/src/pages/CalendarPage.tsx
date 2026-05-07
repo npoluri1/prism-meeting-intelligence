@@ -419,15 +419,7 @@ export function CalendarPage() {
   const [currentYear, setCurrentYear] = useState(today.getFullYear())
   const [currentMonth, setCurrentMonth] = useState(today.getMonth())
 
-  const monthStart = useMemo(() => {
-    const d = new Date(currentYear, currentMonth, 1)
-    return isoDate(d)
-  }, [currentYear, currentMonth])
 
-  const monthEnd = useMemo(() => {
-    const d = new Date(currentYear, currentMonth + 1, 0)
-    return isoDate(d)
-  }, [currentYear, currentMonth])
 
   useEffect(() => {
     setLoading(true)

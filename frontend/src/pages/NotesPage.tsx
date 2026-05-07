@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ApiError, getMeeting, updateActionItem } from '../lib/api'
+import { ApiError, getMeeting } from '../lib/api'
 import { AIChatPanel } from '../components/AIChatPanel'
 import { Sidebar } from '../components/Sidebar'
 import { Spinner } from '../components/Spinner'
@@ -54,13 +54,6 @@ const PRIORITY_CLS: Record<string, string> = {
   high:   'bg-orange-100 text-orange-700',
   medium: 'bg-amber-100 text-amber-700',
   low:    'bg-slate-100 text-slate-600',
-}
-
-const STATUS_ICON: Record<string, string> = {
-  open:        '○',
-  in_progress: '◑',
-  done:        '✓',
-  cancelled:   '✕',
 }
 
 export function NotesPage() {

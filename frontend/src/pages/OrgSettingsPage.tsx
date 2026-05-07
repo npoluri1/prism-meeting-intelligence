@@ -61,7 +61,7 @@ export function OrgSettingsPage() {
   const [website, setWebsite]   = useState('')
 
   const [integrations, setIntegrations] = useState<CalendarIntegration[]>([])
-  const [intLoading, setIntLoading]     = useState(false)
+  const [_intLoading, _setIntLoading]     = useState(false)
   const [connectingId, setConnectingId] = useState<string | null>(null)
 
   useEffect(() => {

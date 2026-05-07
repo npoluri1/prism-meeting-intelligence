@@ -1,15 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ToastProvider, useToast } from './Toast'
-import React from 'react'
 
-// Mock the toast hook usage in a test component
 function TestConsumer() {
-  const { toast } = useToast()
+  const { addToast } = useToast()
   return (
     <div>
-      <button onClick={() => toast('Test message', 'success')}>Show Toast</button>
-      <button onClick={() => toast('Error message', 'error')}>Show Error</button>
+      <button onClick={() => addToast('Test message', 'success')}>Show Toast</button>
+      <button onClick={() => addToast('Error message', 'error')}>Show Error</button>
     </div>
   )
 }

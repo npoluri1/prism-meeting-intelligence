@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useRef, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ApiError, createMeeting, listTemplates, processMeeting, uploadMeeting } from '../lib/api'
 import { Sidebar } from '../components/Sidebar'
@@ -96,7 +96,6 @@ export function NewMeetingPage() {
     }
   }
 
-  const isSubmitting = ['creating', 'processing', 'uploading'].includes(state)
   const industryTemplates = templates.filter(t => t.industry === industry || t.industry === 'general')
 
   const filteredIndustries = industrySearch.trim()
