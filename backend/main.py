@@ -21,6 +21,7 @@ from routers.organizations import (
 )
 from routers.chat import router as chat_router
 from routers.webhooks import router as webhooks_router
+from routers.enterprise import router as enterprise_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,6 +49,7 @@ app.include_router(analytics_router)
 app.include_router(calendar_router)
 app.include_router(domains_router)
 app.include_router(webhooks_router)
+app.include_router(enterprise_router)
 app.include_router(chat_router)
 
 

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Prism Live Capture",
+  "version": "1.0.0",
+  "description": "Capture tab audio during live meetings for Prism (Phase 5 stub)",
+  "permissions": ["tabCapture", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Prism Live Capture"
+  },
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

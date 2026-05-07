@@ -220,7 +220,6 @@ async def delete_meeting(
 
 @router.post("/upload", response_model=MeetingOut, status_code=status.HTTP_202_ACCEPTED)
 async def upload_meeting(
-    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     title: str = Form(..., min_length=1, max_length=200),
     industry: str = Form(default="general"),
@@ -257,16 +256,31 @@ async def upload_meeting(
         organization_id=organization_id or None,
     )
 
-    background_tasks.add_task(
-        _process_upload_background,
-        meeting_id=row["id"],
-        file_bytes=file_bytes,
-        filename=filename,
-        user_id=current_user["id"],
-        user_email=current_user["email"],
-        user_token=current_user["token"],
-        industry=industry,
-    )
+    # Dispatch to Celery worker (Phase 2)
+    try:
+        from worker import process_upload_task
+        process_upload_task.delay(
+            meeting_id=row["id"],
+            file_bytes=file_bytes,
+            filename=filename,
+            user_id=current_user["id"],
+            user_email=current_user["email"],
+            user_token=current_user["token"],
+            industry=industry,
+        )
+    except Exception:
+        logger.warning("Celery not available, falling back to sync processing")
+        # Fallback: process inline if Celery is not running
+        import asyncio
+        asyncio.create_task(_process_upload_background(
+            meeting_id=row["id"],
+            file_bytes=file_bytes,
+            filename=filename,
+            user_id=current_user["id"],
+            user_email=current_user["email"],
+            user_token=current_user["token"],
+            industry=industry,
+        ))
 
     return MeetingOut(
         id=row["id"],

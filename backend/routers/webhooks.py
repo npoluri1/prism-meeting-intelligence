@@ -23,6 +23,38 @@ router = APIRouter(prefix="/api/webhooks", tags=["webhooks"])
 _claude = ClaudeService()
 
 
+# ── Google Meet ──────────────────────────────────────────────────────────
+
+@router.post("/google-meet")
+async def google_meet_webhook(request: Request) -> dict:
+    """Receive Google Drive push notifications for Meet recordings (Phase 3)."""
+    payload = await request.json()
+    logger.info("Google Meet webhook: %s", payload.get("kind", "unknown"))
+
+    # Phase 3: Download from Drive API, then ingest
+    # from services.google_meet_service import GoogleMeetService
+    # svc = GoogleMeetService()
+    # await svc.handle_recording_notification(payload)
+
+    return {"status": "stub", "message": "Google Meet integration in Phase 3"}
+
+
+# ── Cisco Webex ─────────────────────────────────────────────────────────
+
+@router.post("/webex")
+async def webex_webhook(request: Request) -> dict:
+    """Receive Webex webhooks for recording events (Phase 3)."""
+    payload = await request.json()
+    logger.info("Webex webhook: %s", payload.get("eventType", "unknown"))
+
+    # Phase 3: Download from Webex API, then ingest
+    # from services.webex_service import WebexService
+    # svc = WebexService()
+    # await svc.handle_webhook(payload)
+
+    return {"status": "stub", "message": "Webex integration in Phase 3"}
+
+
 # ── Zoom ──────────────────────────────────────────────────────────────────────
 
 @router.post("/zoom")
