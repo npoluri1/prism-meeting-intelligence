@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose *)",
+      "Bash(docker compose -f docker-compose.dev.yml *)",
+      "Bash(npm run *)",
+      "Bash(npm install*)",
+      "Bash(pip install *)",
+      "Bash(pytest *)",
+      "Bash(uvicorn *)",
+      "Bash(black *)",
+      "Bash(isort *)",
+      "Bash(mypy *)"
+    ]
+  }
+}
