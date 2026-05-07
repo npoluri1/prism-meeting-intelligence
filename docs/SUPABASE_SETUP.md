@@ -142,13 +142,14 @@ OPENAI_API_KEY           → backend calls GPT-4o-mini to process transcripts
 | Tables not found (404 from PostgREST) | Re-run `supabase/schema.sql` in the SQL Editor |
 | CORS error in browser | Add `http://localhost:5173` (no trailing slash) to `ALLOWED_ORIGINS` in `.env` |
 | Backend returns 500 on `/process` | Check `OPENAI_API_KEY` is set and has credits |
+| "Failed to fetch" on login | Check `VITE_SUPABASE_URL` is correct in Vercel env vars (set to **Production** scope); verify Supabase project is not paused |
 
 ---
 
 ## Production deployment
 
 When going live (Vercel + Railway), repeat Step 5 and add your production URL:
-- **Site URL**: `https://your-app.vercel.app`
-- **Redirect URLs**: `https://your-app.vercel.app`
+- **Site URL**: `https://prism-meeting-intelligence.vercel.app`
+- **Redirect URLs**: `https://prism-meeting-intelligence.vercel.app`
 
 Full deployment steps are in [docs/DEPLOYMENT.md](DEPLOYMENT.md).

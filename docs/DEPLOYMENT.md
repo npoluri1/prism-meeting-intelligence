@@ -6,8 +6,9 @@
 
 | Service | Platform | URL |
 |---------|----------|-----|
-| Frontend (React SPA) | Vercel | `https://your-app.vercel.app` |
-| Backend (FastAPI) | Railway | `https://your-api.railway.app` |
+| Frontend (React SPA) | Vercel | `https://prism-meeting-intelligence.vercel.app` |
+| Backend (FastAPI) | Railway | `https://prism-api.up.railway.app` |
+| API Docs (Swagger) | Railway | `https://prism-api.up.railway.app/docs` |
 | Database + Auth | Supabase | `https://app.supabase.com` |
 
 ---
@@ -16,7 +17,7 @@
 
 - [ ] All environment variables have production values (not dev)
 - [ ] `ALLOWED_ORIGINS` contains only your production frontend URL
-- [ ] Supabase redirect URLs updated to production domain
+- [x] Supabase redirect URLs updated to production domain (`https://prism-meeting-intelligence.vercel.app`)
 - [ ] RLS is enabled on `meetings` and `notes` tables
 - [ ] Docker images build successfully: `docker compose build`
 - [ ] No secrets in git: `git log --all -S "sk-ant"` returns nothing
@@ -37,11 +38,12 @@
    SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
    SUPABASE_SERVICE_ROLE_KEY=eyJ...
    ANTHROPIC_API_KEY=sk-ant-...
-   ALLOWED_ORIGINS=https://your-app.vercel.app
-   PORT=8000
+    ALLOWED_ORIGINS=https://prism-meeting-intelligence.vercel.app
+    FRONTEND_URL=https://prism-meeting-intelligence.vercel.app
+    PORT=8000
    ```
 6. Click **Deploy**
-7. Once deployed, copy the Railway URL (e.g. `https://meetingmind-api.up.railway.app`)
+7. Once deployed, copy the Railway URL: `https://prism-api.up.railway.app`
 
 ### Subsequent deploys
 
@@ -64,10 +66,10 @@ Railway auto-deploys on every push to your main branch.
    ```
    VITE_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
    VITE_SUPABASE_ANON_KEY=eyJ...
-   VITE_API_URL=https://your-api.railway.app
+    VITE_API_URL=https://prism-api.up.railway.app
    ```
 5. Click **Deploy**
-6. Copy the Vercel URL (e.g. `https://meetingmind.vercel.app`)
+6. Copy the Vercel URL: `https://prism-meeting-intelligence.vercel.app`
 
 ### Subsequent deploys
 
@@ -78,8 +80,8 @@ Vercel auto-deploys on every push to your main branch.
 ## 3. Configure Supabase for Production
 
 1. Go to **Authentication → URL Configuration**:
-   - **Site URL**: `https://your-app.vercel.app`
-   - **Redirect URLs**: Add `https://your-app.vercel.app`
+   - **Site URL**: `https://prism-meeting-intelligence.vercel.app`
+   - **Redirect URLs**: Add `https://prism-meeting-intelligence.vercel.app`
 
 2. Go to **Authentication → Email Templates** and customize the magic link email if desired.
 
@@ -100,7 +102,7 @@ Vercel auto-deploys on every push to your main branch.
 
 After getting your Vercel URL, update the `ALLOWED_ORIGINS` Railway variable:
 ```
-ALLOWED_ORIGINS=https://your-app.vercel.app
+ALLOWED_ORIGINS=https://prism-meeting-intelligence.vercel.app
 ```
 
 Railway will redeploy automatically.
@@ -109,7 +111,7 @@ Railway will redeploy automatically.
 
 ## 5. Verify End-to-End
 
-1. Open `https://your-app.vercel.app`
+1. Open `https://prism-meeting-intelligence.vercel.app`
 2. Enter your email and request a magic link
 3. Click the link in your email — you should be logged in
 4. Submit a short transcript
