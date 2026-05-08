@@ -27,8 +27,10 @@ def _mock_user() -> dict:
 @pytest.fixture
 def client() -> TestClient:
     from dependencies import get_current_user
+    from services.supabase_service import SupabaseService
     app = _make_app()
     app.dependency_overrides[get_current_user] = lambda: _mock_user()
+    app.dependency_overrides[SupabaseService] = lambda: AsyncMock()
     yield TestClient(app)
     app.dependency_overrides.clear()
 
@@ -63,6 +65,7 @@ def test_upload_requires_title(client: TestClient) -> None:
 
 
 def test_upload_accepted_queues_background(client: TestClient) -> None:
+    from services.supabase_service import SupabaseService
     fake_meeting_row = {
         "id": "meet-abc",
         "title": "Q2 Planning",
@@ -72,11 +75,9 @@ def test_upload_accepted_queues_background(client: TestClient) -> None:
 
     mock_svc = AsyncMock()
     mock_svc.create_upload_meeting.return_value = fake_meeting_row
+    client.app.dependency_overrides[SupabaseService] = lambda: mock_svc
 
-    with (
-        patch("routers.meetings.SupabaseService", return_value=mock_svc),
-        patch("routers.meetings._process_upload_background", new_callable=AsyncMock),
-    ):
+    with patch("routers.meetings._process_upload_background", new_callable=AsyncMock):
         resp = client.post(
             "/api/meetings/upload",
             data={"title": "Q2 Planning", "industry": "general"},
@@ -91,6 +92,7 @@ def test_upload_accepted_queues_background(client: TestClient) -> None:
 
 
 def test_upload_mp4_is_allowed(client: TestClient) -> None:
+    from services.supabase_service import SupabaseService
     fake_meeting_row = {
         "id": "meet-xyz",
         "title": "Sales Call",
@@ -100,11 +102,9 @@ def test_upload_mp4_is_allowed(client: TestClient) -> None:
 
     mock_svc = AsyncMock()
     mock_svc.create_upload_meeting.return_value = fake_meeting_row
+    client.app.dependency_overrides[SupabaseService] = lambda: mock_svc
 
-    with (
-        patch("routers.meetings.SupabaseService", return_value=mock_svc),
-        patch("routers.meetings._process_upload_background", new_callable=AsyncMock),
-    ):
+    with patch("routers.meetings._process_upload_background", new_callable=AsyncMock):
         resp = client.post(
             "/api/meetings/upload",
             data={"title": "Sales Call", "industry": "sales"},
