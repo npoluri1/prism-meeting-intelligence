@@ -7,13 +7,15 @@ on:
 jobs:
   deploy-backend:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/railwayapp/cli:latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Deploy to Railway
-        uses: railway-app/railway-deploy@v2
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service ${{ secrets.RAILWAY_SERVICE_ID }} --ci
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         continue-on-error: true
 
   deploy-frontend:
