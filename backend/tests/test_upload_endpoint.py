@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import os
 from unittest.mock import AsyncMock, patch
 
@@ -12,13 +11,13 @@ os.environ.setdefault("SUPABASE_SERVICE_ROLE_KEY", "test_key")
 os.environ.setdefault("OPENAI_API_KEY", "test_openai_key")
 
 
-def _make_client() -> TestClient:
+def _make_app():
     from main import app
-    return TestClient(app)
+    return app
 
 
-def _auth_headers() -> dict[str, str]:
-    return {"Authorization": "Bearer test_token"}
+def _make_client() -> TestClient:
+    return TestClient(_make_app())
 
 
 def _mock_user() -> dict:
@@ -27,42 +26,39 @@ def _mock_user() -> dict:
 
 @pytest.fixture
 def client() -> TestClient:
-    return _make_client()
+    from dependencies import get_current_user
+    app = _make_app()
+    app.dependency_overrides[get_current_user] = lambda: _mock_user()
+    yield TestClient(app)
+    app.dependency_overrides.clear()
 
 
 def test_upload_unsupported_format(client: TestClient) -> None:
-    with patch("dependencies.get_current_user", return_value=_mock_user()):
-        resp = client.post(
-            "/api/meetings/upload",
-            data={"title": "Test Meeting", "industry": "general"},
-            files={"file": ("recording.exe", b"data", "application/octet-stream")},
-            headers=_auth_headers(),
-        )
+    resp = client.post(
+        "/api/meetings/upload",
+        data={"title": "Test Meeting", "industry": "general"},
+        files={"file": ("recording.exe", b"data", "application/octet-stream")},
+    )
     assert resp.status_code == 422
     assert "Unsupported file type" in resp.json()["detail"]
 
 
 def test_upload_empty_file(client: TestClient) -> None:
-    with patch("dependencies.get_current_user", return_value=_mock_user()):
-        resp = client.post(
-            "/api/meetings/upload",
-            data={"title": "Test Meeting"},
-            files={"file": ("recording.mp3", b"", "audio/mpeg")},
-            headers=_auth_headers(),
-        )
+    resp = client.post(
+        "/api/meetings/upload",
+        data={"title": "Test Meeting"},
+        files={"file": ("recording.mp3", b"", "audio/mpeg")},
+    )
     assert resp.status_code == 422
     assert "empty" in resp.json()["detail"].lower()
 
 
 def test_upload_requires_title(client: TestClient) -> None:
-    with patch("dependencies.get_current_user", return_value=_mock_user()):
-        resp = client.post(
-            "/api/meetings/upload",
-            data={},
-            files={"file": ("recording.mp3", b"ID3\x00" * 50, "audio/mpeg")},
-            headers=_auth_headers(),
-        )
-    # FastAPI returns 422 when required form field is missing
+    resp = client.post(
+        "/api/meetings/upload",
+        data={},
+        files={"file": ("recording.mp3", b"ID3\x00" * 50, "audio/mpeg")},
+    )
     assert resp.status_code == 422
 
 
@@ -78,7 +74,6 @@ def test_upload_accepted_queues_background(client: TestClient) -> None:
     mock_svc.create_upload_meeting.return_value = fake_meeting_row
 
     with (
-        patch("dependencies.get_current_user", return_value=_mock_user()),
         patch("routers.meetings.SupabaseService", return_value=mock_svc),
         patch("routers.meetings._process_upload_background", new_callable=AsyncMock),
     ):
@@ -86,7 +81,6 @@ def test_upload_accepted_queues_background(client: TestClient) -> None:
             "/api/meetings/upload",
             data={"title": "Q2 Planning", "industry": "general"},
             files={"file": ("recording.mp3", b"ID3" + b"\x00" * 200, "audio/mpeg")},
-            headers=_auth_headers(),
         )
 
     assert resp.status_code == 202
@@ -108,7 +102,6 @@ def test_upload_mp4_is_allowed(client: TestClient) -> None:
     mock_svc.create_upload_meeting.return_value = fake_meeting_row
 
     with (
-        patch("dependencies.get_current_user", return_value=_mock_user()),
         patch("routers.meetings.SupabaseService", return_value=mock_svc),
         patch("routers.meetings._process_upload_background", new_callable=AsyncMock),
     ):
@@ -116,7 +109,6 @@ def test_upload_mp4_is_allowed(client: TestClient) -> None:
             "/api/meetings/upload",
             data={"title": "Sales Call", "industry": "sales"},
             files={"file": ("recording.mp4", b"\x00\x00\x00\x18ftyp" + b"\x00" * 100, "video/mp4")},
-            headers=_auth_headers(),
         )
 
     assert resp.status_code == 202
