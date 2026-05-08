@@ -108,7 +108,7 @@ class SupabaseService:
         http = _get_http()
         # Use admin headers + app-level filter to avoid RLS recursion from org policies
         params: dict[str, str] = {
-            "select": "id,title,status,created_at,industry,source,media_url",
+            "select": "id,title,status,created_at,organization_id,industry,source,media_url",
             "order": "created_at.desc",
         }
         if organization_id:
