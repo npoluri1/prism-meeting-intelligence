@@ -81,6 +81,8 @@ async def list_meetings(
             title=r["title"],
             status=r["status"],
             created_at=r["created_at"],
+            organization_id=r.get("organization_id"),
+            industry=r.get("industry", "general"),
             source=r.get("source", "transcript"),
             media_url=r.get("media_url"),
         )
@@ -111,6 +113,8 @@ async def create_meeting(
         title=row["title"],
         status=row["status"],
         created_at=row["created_at"],
+        organization_id=row.get("organization_id"),
+        industry=row.get("industry", "general"),
         source="transcript",
     )
 
@@ -139,6 +143,13 @@ async def get_meeting(
         title=row["title"],
         status=row["status"],
         created_at=row["created_at"],
+        organization_id=row.get("organization_id"),
+        industry=row.get("industry", "general"),
+        source=row.get("source", "transcript"),
+        media_url=row.get("media_url"),
+        meeting_date=row.get("meeting_date"),
+        location=row.get("location"),
+        attendees=row.get("attendees"),
         notes=notes_out,
     )
 
@@ -198,6 +209,13 @@ async def process_meeting(
         title=row["title"],
         status="done",
         created_at=row["created_at"],
+        organization_id=row.get("organization_id"),
+        industry=row.get("industry", "general"),
+        source=row.get("source", "transcript"),
+        media_url=row.get("media_url"),
+        meeting_date=row.get("meeting_date"),
+        location=row.get("location"),
+        attendees=row.get("attendees"),
         notes=notes_out,
     )
 

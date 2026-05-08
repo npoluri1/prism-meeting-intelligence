@@ -60,6 +60,8 @@ class MeetingWithNotes(BaseModel):
     created_at: datetime
     organization_id: Optional[str] = None
     industry: Optional[str] = "general"
+    source: Optional[str] = "transcript"
+    media_url: Optional[str] = None
     meeting_date: Optional[str] = None
     location: Optional[str] = None
     attendees: Optional[list] = None

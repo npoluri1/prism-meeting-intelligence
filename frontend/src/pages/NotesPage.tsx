@@ -67,6 +67,8 @@ export function NotesPage() {
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null)
   const [chatOpen, setChatOpen] = useState(false)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const meetingRef = useRef(meeting)
+  meetingRef.current = meeting
 
   function stopPolling() { if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null } }
 
@@ -85,7 +87,8 @@ export function NotesPage() {
     }
     load()
     pollRef.current = setInterval(() => {
-      if (meeting?.status === 'done' || meeting?.status === 'error') { stopPolling(); return }
+      const current = meetingRef.current
+      if (current?.status === 'done' || current?.status === 'error') { stopPolling(); return }
       load()
     }, POLL_MS)
     return stopPolling
