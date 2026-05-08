@@ -9,11 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_SERVICE_ID: 94f269fa-fc48-47c6-a544-ff030d9c8293
     steps:
       - uses: actions/checkout@v4
 
       - name: Deploy to Railway
-        run: railway up --service ${{ secrets.RAILWAY_SERVICE_ID }} --ci
+        run: railway up --service $RAILWAY_SERVICE_ID --ci
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         continue-on-error: true
