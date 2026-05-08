@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { ToastProvider, useToast } from './Toast'
 
 function TestConsumer() {
@@ -47,8 +47,14 @@ describe('Toast', () => {
     fireEvent.click(screen.getByText('Show Toast'))
     expect(screen.getByText('Test message')).toBeTruthy()
 
-    vi.advanceTimersByTime(4000)
+    act(() => {
+      vi.advanceTimersByTime(4000)
+    })
     expect(screen.queryByText('Test message')).toBeNull()
+    vi.useRealTimers()
+  })
+  
+  afterEach(() => {
     vi.useRealTimers()
   })
 })

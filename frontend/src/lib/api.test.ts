@@ -9,13 +9,13 @@ describe('createMeeting', () => {
       transcript: 'Test transcript here',
       industry: 'general',
     }
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ id: '123', ...payload, status: 'pending' }),
     } as Response)
 
     await createMeeting(payload)
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
         method: 'POST',
