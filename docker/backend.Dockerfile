@@ -1,7 +1,7 @@
 # File: docker/backend.Dockerfile
 FROM python:3.11-slim AS base
 
-# build-cache-invalidate: 2026-05-07-v2
+# build-cache-invalidate: 2026-05-08-v3
 
 WORKDIR /app
 
