@@ -28,7 +28,7 @@ async def test_no_provider_raises_when_no_keys(monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.delenv("ASSEMBLYAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     svc = TranscriptionService()
-    with pytest.raises(RuntimeError, match="No transcription provider"):
+    with pytest.raises(RuntimeError, match="no provider available"):
         await svc.transcribe(b"data", "recording.mp3")
 
 
