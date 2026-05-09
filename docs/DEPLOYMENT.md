@@ -7,8 +7,8 @@
 | Service | Platform | URL |
 |---------|----------|-----|
 | Frontend (React SPA) | Vercel | `https://prism-meeting-intelligence.vercel.app` |
-| Backend (FastAPI) | Railway | `https://prism-api.up.railway.app` |
-| API Docs (Swagger) | Railway | `https://prism-api.up.railway.app/docs` |
+| Backend (FastAPI) | Railway | `https://prism-meeting-intelligence-production.up.railway.app` |
+| API Docs (Swagger) | Railway | `https://prism-meeting-intelligence-production.up.railway.app/docs` |
 | Database + Auth | Supabase | `https://app.supabase.com` |
 
 ---
@@ -43,7 +43,7 @@
     PORT=8000
    ```
 6. Click **Deploy**
-7. Once deployed, copy the Railway URL: `https://prism-api.up.railway.app`
+7. Once deployed, copy the Railway URL: `https://prism-meeting-intelligence-production.up.railway.app`
 
 ### Subsequent deploys
 
@@ -66,7 +66,7 @@ Railway auto-deploys on every push to your main branch.
    ```
    VITE_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
    VITE_SUPABASE_ANON_KEY=eyJ...
-    VITE_API_URL=https://prism-api.up.railway.app
+    VITE_API_URL=https://prism-meeting-intelligence-production.up.railway.app
    ```
 5. Click **Deploy**
 6. Copy the Vercel URL: `https://prism-meeting-intelligence.vercel.app`
