@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ApiError, addOrgMember, listOrgMembers } from '../lib/api'
 import { Sidebar } from '../components/Sidebar'
 import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/Toast'
 import type { OrgMember } from '../types'
 
 const ROLE_BADGE: Record<string, string> = {
@@ -14,6 +15,7 @@ const ROLE_BADGE: Record<string, string> = {
 export function OrgMembersPage() {
   const { orgId } = useParams<{ orgId: string }>()
   const navigate = useNavigate()
+  const toast = useToast()
   const [members, setMembers] = useState<OrgMember[]>([])
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
@@ -25,7 +27,7 @@ export function OrgMembersPage() {
     if (!orgId) return
     listOrgMembers(orgId)
       .then(setMembers)
-      .catch(() => {})
+      .catch(() => toast.error('Failed to load members'))
       .finally(() => setLoading(false))
   }, [orgId])
 

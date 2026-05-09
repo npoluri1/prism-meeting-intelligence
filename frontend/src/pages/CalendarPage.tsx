@@ -457,7 +457,7 @@ export function CalendarPage() {
       setMeetings(prev => prev.filter(m => m.id !== sm.id))
       setSelected(null)
       toast.success('Meeting deleted')
-    } catch { toast.error('Failed to delete') }
+    } catch (err) { toast.error(err instanceof ApiError ? err.detail : 'Failed to delete') }
   }
 
   async function handleCancel(sm: ScheduledMeeting) {
@@ -466,7 +466,7 @@ export function CalendarPage() {
       setMeetings(prev => prev.map(m => m.id === sm.id ? updated : m))
       setSelected(null)
       toast.info('Meeting cancelled')
-    } catch { toast.error('Failed to cancel') }
+    } catch (err) { toast.error(err instanceof ApiError ? err.detail : 'Failed to cancel') }
   }
 
   // ── Month view data ────────────────────────────────────────────────────────

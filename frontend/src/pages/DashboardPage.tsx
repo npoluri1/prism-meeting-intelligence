@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ApiError, deleteMeeting, getMyAnalytics, getOrgAnalytics, listMeetings, listMyActionItems, getOrgActionItems, updateActionItem } from '../lib/api'
 import { Sidebar } from '../components/Sidebar'
 import { Spinner } from '../components/Spinner'
+import { useToast } from '../components/Toast'
 import type { ActionItemRecord, Analytics, Meeting, MeetingSource } from '../types'
 import { INDUSTRIES } from '../types'
 
@@ -127,18 +128,26 @@ export function DashboardPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [actionFilter, setActionFilter] = useState<string>('open')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const toast = useToast()
 
   useEffect(() => {
     setLoading(true); setError('')
+    setAnalytics(null)
     const orgId = activeOrgId ?? undefined
-    Promise.all([
-      listMeetings(orgId),
-      activeOrgId ? getOrgActionItems(activeOrgId) : listMyActionItems(),
-      activeOrgId ? getOrgAnalytics(activeOrgId) : getMyAnalytics(),
-    ])
-      .then(([m, ai, an]) => { setMeetings(m); setActionItems(ai); setAnalytics(an) })
+
+    // Load meetings — primary data, failure shows error
+    listMeetings(orgId)
+      .then(setMeetings)
       .catch((err: unknown) => setError(err instanceof ApiError ? err.detail : 'Failed to load'))
       .finally(() => setLoading(false))
+
+    // Load action items — non-critical, defaults to empty
+    const aiPromise = activeOrgId ? getOrgActionItems(activeOrgId) : listMyActionItems()
+    aiPromise.then(setActionItems).catch(() => {})
+
+    // Load analytics — non-critical, defaults to null
+    const anPromise = activeOrgId ? getOrgAnalytics(activeOrgId) : getMyAnalytics()
+    anPromise.then(setAnalytics).catch(() => {})
   }, [activeOrgId])
 
   const filtered = useMemo(() => meetings.filter(m => {
@@ -156,7 +165,7 @@ export function DashboardPage() {
     if (!confirm('Delete this meeting and its notes?')) return
     setDeletingId(id)
     try { await deleteMeeting(id); setMeetings(p => p.filter(m => m.id !== id)) }
-    catch { alert('Failed to delete') }
+    catch (err) { toast.error(err instanceof ApiError ? err.detail : 'Failed to delete') }
     finally { setDeletingId(null) }
   }
 
@@ -165,7 +174,9 @@ export function DashboardPage() {
     try {
       await updateActionItem(item.id, { status: next })
       setActionItems(prev => prev.map(a => a.id === item.id ? { ...a, status: next } : a))
-    } catch { /* silent */ }
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.detail : 'Failed to update action item')
+    }
   }
 
   return (
@@ -189,15 +200,17 @@ export function DashboardPage() {
         {loading && <div className="flex justify-center py-20"><Spinner size="lg" /></div>}
         {error && <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>}
 
-        {!loading && analytics && (
+        {!loading && (
           <>
-            {/* Stats */}
-            <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <StatCard label="Total Meetings" value={analytics.total_meetings} icon="📋" color="bg-violet-50" />
-              <StatCard label="Completed"      value={analytics.done}           icon="✅" color="bg-emerald-50" sub={`${analytics.total_meetings ? Math.round(analytics.done / analytics.total_meetings * 100) : 0}% completion rate`} />
-              <StatCard label="Open Tasks"     value={analytics.action_items_open} icon="🎯" color="bg-amber-50" sub={`${analytics.action_items_done} completed`} />
-              <StatCard label="Processing"     value={analytics.processing}     icon="⚡" color="bg-blue-50" />
-            </div>
+            {/* Stats — only shown when analytics loaded */}
+            {analytics && (
+              <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <StatCard label="Total Meetings" value={analytics.total_meetings} icon="📋" color="bg-violet-50" />
+                <StatCard label="Completed"      value={analytics.done}           icon="✅" color="bg-emerald-50" sub={`${analytics.total_meetings ? Math.round(analytics.done / analytics.total_meetings * 100) : 0}% completion rate`} />
+                <StatCard label="Open Tasks"     value={analytics.action_items_open} icon="🎯" color="bg-amber-50" sub={`${analytics.action_items_done} completed`} />
+                <StatCard label="Processing"     value={analytics.processing}     icon="⚡" color="bg-blue-50" />
+              </div>
+            )}
 
             {/* Tabs */}
             <div className="mb-4 flex gap-1 rounded-xl border border-slate-200 bg-white p-1 w-fit">
@@ -326,7 +339,7 @@ export function DashboardPage() {
             )}
 
             {/* ── Tab: Analytics ── */}
-            {dashTab === 'analytics' && (
+            {dashTab === 'analytics' && analytics && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="rounded-2xl bg-white p-6 shadow-sm">
