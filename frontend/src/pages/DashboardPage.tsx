@@ -1,4 +1,3 @@
-// DashboardPage v2
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ApiError, deleteMeeting, getMyAnalytics, getOrgAnalytics, listMeetings, listMyActionItems, getOrgActionItems, updateActionItem } from '../lib/api'
@@ -51,7 +50,7 @@ function PrismEmptyState({ orgId }: { orgId: string | null }) {
         <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 text-3xl font-black text-white">P</div>
         <h2 className="text-2xl font-bold">Welcome to Prism</h2>
         <p className="mt-2 text-violet-200 text-sm max-w-lg mx-auto">
-          Upload a recording or paste a transcript — Prism extracts action items, decisions, risks,
+          Upload a recording or paste a transcript — AI extracts action items, decisions, risks,
           and sentiment across 33 industry domains.
         </p>
         <Link
