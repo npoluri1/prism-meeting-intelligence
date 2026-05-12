@@ -25,7 +25,10 @@ export function Sidebar({ activeOrgId, onOrgChange }: SidebarProps) {
   useEffect(() => {
     listOrganizations()
       .then(setOrgs)
-      .catch(() => toast.error('Failed to load workspaces'))
+      .catch((err) => {
+        const msg = err instanceof ApiError ? err.detail : 'Failed to load workspaces'
+        toast.error(msg)
+      })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

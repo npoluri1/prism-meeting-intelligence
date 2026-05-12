@@ -15,22 +15,17 @@ export function AuthGuard({ children }: AuthGuardProps) {
   useEffect(() => {
     let cancelled = false
 
-    // Call getSession() first — it awaits Supabase client initialization
-    // and recovers sessions from URL hash or localStorage.
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (cancelled) return
-      if (session) {
-        setAuthenticated(true)
-        setLoading(false)
-      }
-    })
-
-    // Also listen for auth state changes — fires immediately with current session,
-    // then on every subsequent change (SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED).
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (cancelled) return
       setAuthenticated(!!session)
       setLoading(false)
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return
+      if (_event !== 'INITIAL_SESSION') {
+        setAuthenticated(!!session)
+      }
     })
 
     return () => {

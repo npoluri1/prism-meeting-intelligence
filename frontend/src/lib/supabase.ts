@@ -16,9 +16,8 @@ export async function getSessionToken(): Promise<string | null> {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return null
 
-  // Refresh the token if it expires within the next 60 seconds
   const now = Math.floor(Date.now() / 1000)
-  if ((session.expires_at ?? 0) - now < 60) {
+  if ((session.expires_at ?? 0) - now < 120) {
     const { data: refreshed, error } = await supabase.auth.refreshSession()
     if (error || !refreshed.session) return null
     return refreshed.session.access_token
