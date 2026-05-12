@@ -13,15 +13,28 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const [authenticated, setAuthenticated] = useState(false)
 
   useEffect(() => {
-    // onAuthStateChange fires immediately with the current session — including
-    // sessions recovered from the magic-link URL hash — so we wait for it
-    // before deciding whether the user is authenticated.
+    let cancelled = false
+
+    // Call getSession() first — it awaits Supabase client initialization
+    // and recovers sessions from URL hash or localStorage.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return
+      if (session) {
+        setAuthenticated(true)
+        setLoading(false)
+      }
+    })
+
+    // Also listen for auth state changes — fires immediately with current session,
+    // then on every subsequent change (SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED).
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return
       setAuthenticated(!!session)
       setLoading(false)
     })
 
     return () => {
+      cancelled = true
       listener.subscription.unsubscribe()
     }
   }, [])

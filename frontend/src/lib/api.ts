@@ -15,7 +15,7 @@ import type {
 } from '../types'
 import { getSessionToken } from './supabase'
 
-const API_BASE = import.meta.env.VITE_API_URL as string
+const API_BASE = (import.meta.env.VITE_API_URL as string) || ''
 
 export class ApiError extends Error {
   constructor(

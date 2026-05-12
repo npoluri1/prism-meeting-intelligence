@@ -8,18 +8,21 @@ export function AuthCallbackPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    let cancelled = false
     const code = new URLSearchParams(window.location.search).get('code')
-    if (code) {
-      // PKCE flow — exchange the one-time code for a session
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        navigate(error ? '/login' : '/dashboard', { replace: true })
-      })
-    } else {
-      // Password / implicit flow — session already in storage
-      supabase.auth.getSession().then(({ data }) => {
-        navigate(data.session ? '/dashboard' : '/login', { replace: true })
-      })
+
+    async function handleCallback() {
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (!cancelled) navigate(error ? '/login' : '/dashboard', { replace: true })
+      } else {
+        const { data } = await supabase.auth.getSession()
+        if (!cancelled) navigate(data.session ? '/dashboard' : '/login', { replace: true })
+      }
     }
+    handleCallback()
+
+    return () => { cancelled = true }
   }, [navigate])
 
   return (

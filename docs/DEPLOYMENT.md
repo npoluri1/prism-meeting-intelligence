@@ -66,8 +66,8 @@ Railway auto-deploys on every push to your main branch.
    ```
    VITE_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
    VITE_SUPABASE_ANON_KEY=eyJ...
-    VITE_API_URL=https://prism-meeting-intelligence-production.up.railway.app
    ```
+   > **Note:** `VITE_API_URL` is intentionally omitted — `vercel.json` rewrites `/api/*` requests directly to the Railway backend, making all API calls same-origin. This eliminates CORS issues and works without any Vercel env var.
 5. Click **Deploy**
 6. Copy the Vercel URL: `https://prism-meeting-intelligence.vercel.app`
 
@@ -81,7 +81,9 @@ Vercel auto-deploys on every push to your main branch.
 
 1. Go to **Authentication → URL Configuration**:
    - **Site URL**: `https://prism-meeting-intelligence.vercel.app`
-   - **Redirect URLs**: Add `https://prism-meeting-intelligence.vercel.app`
+   - **Redirect URLs**: Add both of these:
+     - `https://prism-meeting-intelligence.vercel.app`
+     - `https://prism-meeting-intelligence.vercel.app/auth/callback`
 
 2. Go to **Authentication → Email Templates** and customize the magic link email if desired.
 
@@ -102,8 +104,10 @@ Vercel auto-deploys on every push to your main branch.
 
 After getting your Vercel URL, update the `ALLOWED_ORIGINS` Railway variable:
 ```
-ALLOWED_ORIGINS=https://prism-meeting-intelligence.vercel.app
+ALLOWED_ORIGINS=http://localhost:5173,https://prism-meeting-intelligence.vercel.app
 ```
+
+> **Note:** With `vercel.json` proxying `/api/*` to Railway, the browser never makes cross-origin requests in production. CORS is still needed for local development (`http://localhost:5173`) and for any direct Railway API access.
 
 Railway will redeploy automatically.
 
