@@ -1,4 +1,3 @@
-// File: frontend/src/pages/AuthCallbackPage.tsx
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -9,9 +8,18 @@ export function AuthCallbackPage() {
 
   useEffect(() => {
     let cancelled = false
-    const code = new URLSearchParams(window.location.search).get('code')
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
+    const err = params.get('error')
+    const errDesc = params.get('error_description')
 
     async function handleCallback() {
+      if (err) {
+        console.error('Auth callback error:', errDesc || err)
+        if (!cancelled) navigate('/login?error=link_expired', { replace: true })
+        return
+      }
+
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!cancelled) navigate(error ? '/login' : '/dashboard', { replace: true })

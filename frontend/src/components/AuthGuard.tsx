@@ -17,7 +17,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (cancelled) return
-      setAuthenticated(!!session)
+      if (session && session.expires_at) {
+        const isExpired = Date.now() / 1000 > session.expires_at
+        setAuthenticated(!isExpired)
+      } else {
+        setAuthenticated(!!session)
+      }
       setLoading(false)
     })
 

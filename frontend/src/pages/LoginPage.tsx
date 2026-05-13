@@ -44,8 +44,14 @@ export function LoginPage() {
   const [mode, setMode] = useState<Mode>('password')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [state, setState] = useState<State>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
+  const [state, setState] = useState<State>(
+    new URLSearchParams(window.location.search).get('error') === 'link_expired' ? 'error' : 'idle'
+  )
+  const [errorMsg, setErrorMsg] = useState(
+    new URLSearchParams(window.location.search).get('error') === 'link_expired'
+      ? 'This magic link has expired. Please request a new one.'
+      : ''
+  )
 
   async function handleMagicLink(e: FormEvent) {
     e.preventDefault()

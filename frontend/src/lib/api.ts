@@ -36,7 +36,19 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
   }
   if (token) headers['Authorization'] = `Bearer ${token}`
   const response = await fetch(`${API_BASE}${path}`, { ...options, headers })
+
   if (response.status === 204) return undefined as unknown as T
+
+  if (response.status === 401) {
+    const refreshed = await getSessionToken()
+    if (refreshed) {
+      headers['Authorization'] = `Bearer ${refreshed}`
+      const retry = await fetch(`${API_BASE}${path}`, { ...options, headers })
+      if (retry.status === 204) return undefined as unknown as T
+      if (retry.ok) return (await retry.json()) as T
+    }
+  }
+
   const body = await response.json().catch(() => ({ detail: 'Unexpected server error', code: 'INTERNAL_ERROR' }))
   if (!response.ok) throw new ApiError(body.detail ?? 'Request failed', body.code ?? 'UNKNOWN_ERROR', response.status)
   return body as T

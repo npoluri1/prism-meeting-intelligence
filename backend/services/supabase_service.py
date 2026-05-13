@@ -18,7 +18,7 @@ _profile_cache: set[str] = set()
 def _get_http() -> httpx.AsyncClient:
     global _http
     if _http is None:
-        _http = httpx.AsyncClient(timeout=15.0)
+        _http = httpx.AsyncClient(timeout=30.0)
     return _http
 
 
