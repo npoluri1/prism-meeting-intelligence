@@ -6,7 +6,7 @@ import httpx
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from services.supabase_service import SupabaseService
+from services.supabase_service import SupabaseApiKeyError, SupabaseService
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +27,12 @@ async def get_current_user(
     token = credentials.credentials
     try:
         user = await svc.get_user_from_token(token)
+    except SupabaseApiKeyError:
+        logger.critical("SUPABASE_SERVICE_ROLE_KEY is invalid — auth is broken")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server authentication misconfigured. Please contact support.",
+        )
     except httpx.TransportError as exc:
         logger.warning("Auth network error contacting Supabase: %s", exc)
         raise HTTPException(

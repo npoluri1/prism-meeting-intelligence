@@ -15,6 +15,14 @@ _http: Optional[httpx.AsyncClient] = None
 _profile_cache: set[str] = set()
 
 
+class SupabaseApiKeyError(Exception):
+    """The SUPABASE_SERVICE_ROLE_KEY is invalid or misconfigured."""
+
+
+class SupabaseTokenError(Exception):
+    """The user's access token is invalid or expired."""
+
+
 def _get_http() -> httpx.AsyncClient:
     global _http
     if _http is None:
@@ -65,7 +73,10 @@ class SupabaseService:
             logger.warning("auth/v1/user failed: %s", exc)
             raise
         if resp.status_code != 200:
-            logger.warning("auth/v1/user %s: %s", resp.status_code, resp.text[:200])
+            body = resp.text[:300]
+            logger.warning("auth/v1/user %s: %s", resp.status_code, body)
+            if resp.status_code == 401 and ('"Invalid API key"' in body or 'Invalid API key' in body):
+                raise SupabaseApiKeyError("SUPABASE_SERVICE_ROLE_KEY is invalid")
             return None
         data = resp.json()
         user_id = str(data["id"])
