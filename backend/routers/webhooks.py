@@ -209,6 +209,7 @@ async def _ingest_recording(
 
     effective_user_id = user_id or "system"
     effective_token = user_token or ""
+    meeting_id: str | None = None
 
     try:
         media_url = await storage.upload_file(file_bytes, filename, effective_user_id)
@@ -254,3 +255,13 @@ async def _ingest_recording(
 
     except Exception:
         logger.error("Webhook ingestion failed for: %s", title, exc_info=True)
+        if meeting_id:
+            try:
+                await svc.update_meeting_status(meeting_id, "error", effective_token)
+            except Exception:
+                pass
+        if user_email:
+            try:
+                await notification.send_processing_failed(user_email, title, str(meeting_id or "unknown"))
+            except Exception:
+                pass
